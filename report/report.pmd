@@ -1,0 +1,111 @@
+# New York City Taxis Statistics
+
+```python, echo=False, name='get_object_from_S3'
+import json
+import boto3
+
+s3 = boto3.client('s3')
+response = s3.get_object(Bucket='test-vinilab', Key='data-engineer-challenge/output/report_data.json')
+nyc_stats = json.loads(response['Body'].read())
+```
+
+What is the average distance traveled by trips with a maximum of 2 passengers?
+
+```python, echo=False, name='plot_avg_distance'
+nyc_stats['avg_distance_km']
+```
+
+Which are the 3 biggest vendors based on the total amount of money raised?
+```python, echo=False, name='plot_avg_distance'
+from bokeh.layouts import widgetbox
+from bokeh.models import ColumnDataSource
+from pweave.bokeh import output_pweave, show
+from bokeh.models.widgets import DataTable, TableColumn
+
+output_pweave()
+
+keys = []
+values = []
+for vendor in nyc_stats["top_vendors"]:
+    keys.append(vendor["name"])
+    values.append(vendor["money_raised"])
+
+data = dict(vendors=keys, values =values)
+
+columns = [
+        TableColumn(field="vendors", title="Vendors"),
+        TableColumn(field="values", title="Income"),
+    ]
+data_table = DataTable(source=ColumnDataSource(data), columns=columns, width=600, height=100)
+
+show(widgetbox(data_table))
+```
+
+Make a histogram of the monthly distribution over 4 years of rides paid with cash
+```python, echo=False, name='plot_avg_distance'
+from pweave.bokeh import output_pweave, show
+from bokeh.plotting import figure
+
+output_pweave()
+
+keys = []
+values = []
+for rides in nyc_stats["hist_rides"]:
+    keys.append(rides["year_month"])
+    values.append(rides["num_rides"])
+
+p = figure(x_range=keys, plot_height=500, title="Num rides", plot_width=1000,
+           toolbar_location=None, tools="")
+
+p.vbar(x=keys, top=values, width=0.9)
+
+p.xgrid.grid_line_color = None
+p.y_range.start = 0
+
+show(p)
+```
+
+Make a time series chart computing the number of tips each day for the last 3 months of 2012.
+```python, echo=False, name='plot_avg_distance'
+from pweave.bokeh import output_pweave, show
+from bokeh.plotting import figure
+
+output_pweave()
+
+keys = []
+values = []
+
+for tips in nyc_stats["ts_tips"]:
+    keys.append(tips["year_month_day"])
+    values.append(tips["num_tips"])
+
+p = figure(plot_width=1000, plot_height=500)
+p.line(list(range(0, len(values))), values, line_width=2)
+
+show(p)
+```
+
+What is the average trip time on Saturdays and Sundays
+```python, echo=False, name='plot_avg_distance'
+from pweave.bokeh import output_pweave, show
+from bokeh.plotting import figure
+
+output_pweave()
+
+keys = []
+values = []
+for rides in nyc_stats["weekend_avg_trips"]:
+    keys.append(rides["weekday"])
+    values.append(rides["avg_trip_time_min"])
+
+p = figure(x_range=keys, plot_height=500, title="Num rides", plot_width=1000,
+           toolbar_location=None, tools="")
+
+p.vbar(x=keys, top=values, width=0.9)
+
+p.xgrid.grid_line_color = None
+p.y_range.start = 0
+
+show(p)
+```
+
