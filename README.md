@@ -1,5 +1,14 @@
 # Data Engineer Challenge
 
+
+Requirements
+- Spark 2.4.5
+- Python libs: pweave, Bokeh and boto3
+
+```
+spark-submit src/process.py file:///Users/vini/Downloads/data-sample_data-nyctaxi-trips-*-json_corrigido.json file:///Users/vini/Downloads/data-vendor_lookup-csv.csv file:///Users/vini/Downloads/data-payment_lookup-csv.csv test-vinilab data-engineer-challenge/output
+```
+
 Data pipeline is structured in following steps:
 
 - **Collect**: data retrieved from Mixpanel API and then saved locally.

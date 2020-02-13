@@ -1,5 +1,7 @@
+import sys
 import json
 import boto3
+import subprocess
 from datetime import datetime
 from pyspark.sql import SparkSession
 from pyspark import SparkContext, SparkConf
@@ -7,7 +9,7 @@ from pyspark.sql.functions import avg, udf
 from pyspark.sql.types import StringType, IntegerType, DoubleType
 
 
-def run_process():
+def run_job(nyc_trips_path, vendor_info_path, payment_info_path, bucket, output_key_path):
     """
     Run Spark Job. Data wrangling process
     """
@@ -24,11 +26,9 @@ def run_process():
     spark = SparkSession(sparkContext=sc).builder.getOrCreate()
 
     # Load datasets
-    df_taxi_trips = spark.read.json("file:///Users/vini/Downloads/report-sample_data-nyctaxi-trips-*-json_corrigido.json")
-
-    df_vendor_lookup = spark.read.option("header", "true").csv("file:///Users/vini/Downloads/report-vendor_lookup-csv.csv")
-
-    df_payment_lookup = spark.read.option("header", "true").csv("file:///Users/vini/Downloads/report-payment_lookup-csv.csv")
+    df_taxi_trips = spark.read.json(nyc_trips_path)
+    df_vendor_lookup = spark.read.option("header", "true").csv(vendor_info_path)
+    df_payment_lookup = spark.read.option("header", "true").csv(payment_info_path)
 
     # 1. What is the average distance traveled by trips with a maximum of 2 passengers;
     avg_distance = df_taxi_trips.filter("passenger_count<=2").agg(avg("trip_distance"))
@@ -96,11 +96,11 @@ def run_process():
 
     # Save JSON to S3
     client = boto3.client('s3')
-    response = client.put_object(Bucket='test-vinilab',
+    response = client.put_object(Bucket=bucket,
                                  Body=json.dumps(response_dict),
-                                 Key='report-engineer-challenge/output/report_data.json')
+                                 Key='{}/report_data.json'.format(output_key_path))
 
-    print("Uploaded object: " + response['ETag'])
+    print("JSON Object uploaded. ETag=" + response['ETag'])
 
     spark.stop()
 
@@ -140,4 +140,24 @@ def get_trip_time(dropoff, pickup):
 
 
 if __name__ == '__main__':
-    run_process()
+
+    # Get info about the files
+    nyc_trips = sys.argv[1]
+    vendor_info = sys.argv[2]
+    payment_info = sys.argv[3]
+    bucket_path = sys.argv[4]
+    output_path = sys.argv[5]
+
+    run_job(nyc_trips, vendor_info, payment_info, bucket_path, output_path)
+
+    # Generate report
+    cmd = ['pweave', '-f', 'md2html', 'report/report.pmd']
+    proc = subprocess.Popen(cmd)
+    proc.communicate()
+
+    # Upload HTML report to S3
+    cmd = ['aws', 's3', 'cp', 'report/report.html', 's3://{}/{}/'.format(bucket_path, output_path)]
+    proc = subprocess.Popen(cmd)
+    proc.communicate()
+
+    print("Done!")
