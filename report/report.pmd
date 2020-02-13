@@ -9,13 +9,15 @@ response = s3.get_object(Bucket='test-vinilab', Key='data-engineer-challenge/out
 nyc_stats = json.loads(response['Body'].read())
 ```
 
-What is the average distance traveled by trips with a maximum of 2 passengers?
+### What is the average distance traveled by trips with a maximum of 2 passengers?
+The average distance with a maximum of 2 passengers is approximately **2.66km**.
 
 ```python, echo=False, name='plot_avg_distance'
 nyc_stats['avg_distance_km']
 ```
 
-Which are the 3 biggest vendors based on the total amount of money raised?
+### Which are the 3 biggest vendors based on the total amount of money raised?
+In this analysis, only **cash** payment was included.
 ```python, echo=False, name='plot_avg_distance'
 from bokeh.layouts import widgetbox
 from bokeh.models import ColumnDataSource
@@ -36,12 +38,13 @@ columns = [
         TableColumn(field="vendors", title="Vendors"),
         TableColumn(field="values", title="Income"),
     ]
-data_table = DataTable(source=ColumnDataSource(data), columns=columns, width=600, height=100)
+data_table = DataTable(source=ColumnDataSource(data), columns=columns, width=1000, height=100)
 
 show(widgetbox(data_table))
 ```
 
-Make a histogram of the monthly distribution over 4 years of rides paid with cash
+### Make a histogram of the monthly distribution over 4 years of rides paid with cash
+
 ```python, echo=False, name='monthly_ride_distribution'
 from pweave.bokeh import output_pweave, show
 from bokeh.plotting import figure
@@ -65,7 +68,8 @@ p.y_range.start = 0
 show(p)
 ```
 
-Make a time series chart computing the number of tips each day for the last 3 months of 2012.
+### Make a time series chart computing the number of tips each day for the last 3 months of 2012.
+The dataset only has data until 2012/10/27.
 ```python, echo=False, name='last_month_tips'
 from pweave.bokeh import output_pweave, show
 from bokeh.plotting import figure
@@ -85,7 +89,8 @@ p.line(list(range(0, len(values))), values, line_width=2)
 show(p)
 ```
 
-What is the average trip time on Saturdays and Sundays
+### What is the average trip time on Saturdays and Sundays
+A trip takes on average almost **9 minutes** on weekends.
 ```python, echo=False, name='avg_trips_weekend'
 from pweave.bokeh import output_pweave, show
 from bokeh.plotting import figure
@@ -98,7 +103,7 @@ for rides in nyc_stats["weekend_avg_trips"]:
     keys.append(rides["weekday"])
     values.append(rides["avg_trip_time_min"])
 
-p = figure(x_range=keys, plot_height=500, title="Num rides", plot_width=1000,
+p = figure(x_range=keys, plot_height=500, title="Average trip time on weekends", plot_width=1000,
            toolbar_location=None, tools="")
 
 p.vbar(x=keys, top=values, width=0.9)
@@ -108,5 +113,5 @@ p.y_range.start = 0
 
 show(p)
 ```
-There is almost the same. Almost **9 minutes** it takes an average trip on weekends.
+
 
