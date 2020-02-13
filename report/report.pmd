@@ -42,7 +42,7 @@ show(widgetbox(data_table))
 ```
 
 Make a histogram of the monthly distribution over 4 years of rides paid with cash
-```python, echo=False, name='plot_avg_distance'
+```python, echo=False, name='monthly_ride_distribution'
 from pweave.bokeh import output_pweave, show
 from bokeh.plotting import figure
 
@@ -57,7 +57,7 @@ for rides in nyc_stats["hist_rides"]:
 p = figure(x_range=keys, plot_height=500, title="Num rides", plot_width=1000,
            toolbar_location=None, tools="")
 
-p.vbar(x=keys, top=values, width=0.9)
+p.vbar(x=keys, top=values, width=0.8)
 
 p.xgrid.grid_line_color = None
 p.y_range.start = 0
@@ -66,7 +66,7 @@ show(p)
 ```
 
 Make a time series chart computing the number of tips each day for the last 3 months of 2012.
-```python, echo=False, name='plot_avg_distance'
+```python, echo=False, name='last_month_tips'
 from pweave.bokeh import output_pweave, show
 from bokeh.plotting import figure
 
@@ -86,7 +86,7 @@ show(p)
 ```
 
 What is the average trip time on Saturdays and Sundays
-```python, echo=False, name='plot_avg_distance'
+```python, echo=False, name='avg_trips_weekend'
 from pweave.bokeh import output_pweave, show
 from bokeh.plotting import figure
 

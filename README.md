@@ -2,7 +2,7 @@
 
 ## Requirements
 - Spark 2.4.5
-- Python libs: pweave, Bokeh and boto3. 
+- Python libs: pweave, Bokeh and boto3.
 
 If you run this on Amazon EMR, you should install pweave and Bokeh at cluster bootstrap time.
 
@@ -15,8 +15,10 @@ If you run this script on EMR, just add the spark submit as a EMR Step. The scri
 
 ## Report analysis
 [Download Report](report/report.html)
+[Download Spark Job output - JSON file](report/output.json)
 
 ## TODO
+- Change Bokeh script to generate better graphs
 - AWS Cloudformation to bootstrap EMR Cluster
 - Logs
 - Unit tests
